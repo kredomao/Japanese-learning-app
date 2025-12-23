@@ -1,0 +1,43 @@
+# 依存関係
+node_modules/
+.pnp/
+.pnp.js
+
+# ビルド出力
+.next/
+out/
+build/
+dist/
+
+# 🔒 環境変数（重要！APIキーなど）
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# デバッグ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# エディタ
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# テスト
+coverage/
+
