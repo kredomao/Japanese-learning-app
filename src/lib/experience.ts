@@ -20,6 +20,48 @@ export function getRequiredExpForLevel(level: number): number {
 }
 
 /**
+ * 経験値を獲得し、レベルアップ処理を行う（要件対応版）
+ * 学習1件完了で experience +10 を自動的に加算
+ * 
+ * @param currentState 現在のユーザー状態
+ * @returns 経験値獲得結果（レベルアップフラグを含む）
+ */
+export function gainExperience(currentState: UserState): ExperienceResult {
+  const expGain = EXP_PER_LEARNING; // 学習1件完了で +10
+  let newExperience = currentState.experience + expGain;
+  let newLevel = currentState.level;
+  let leveledUp = false;
+
+  // レベルアップ判定（複数回レベルアップする可能性も考慮）
+  // 次のレベルに必要な経験値は level × 100
+  while (newExperience >= getRequiredExpForLevel(newLevel)) {
+    newExperience -= getRequiredExpForLevel(newLevel);
+    newLevel++;
+    leveledUp = true;
+  }
+
+  return {
+    newExperience,
+    newLevel,
+    leveledUp,
+    experienceGained: expGain,
+    bonusExp: 0,
+    streakMultiplier: 1,
+  };
+}
+
+/**
+ * レベルアップ可能かチェック（要件対応版）
+ * 
+ * @param state ユーザー状態
+ * @returns レベルアップ可能かどうかのフラグ
+ */
+export function checkLevelUp(state: UserState): boolean {
+  const required = getRequiredExpForLevel(state.level);
+  return state.experience >= required;
+}
+
+/**
  * 現在のレベルでの経験値進捗を取得
  * @param state ユーザー状態
  * @returns { current: 現在の経験値, required: 必要経験値, percentage: 進捗率 }
@@ -50,12 +92,12 @@ export function canLevelUp(state: UserState): boolean {
 }
 
 /**
- * 経験値を獲得し、レベルアップ処理を行う
+ * 経験値を獲得し、レベルアップ処理を行う（拡張版）
  * @param currentState 現在のユーザー状態
  * @param expGain 獲得経験値（デフォルト: EXP_PER_LEARNING）
  * @returns 経験値獲得結果
  */
-export function gainExperience(
+export function gainExperienceWithAmount(
   currentState: UserState,
   expGain: number = EXP_PER_LEARNING
 ): ExperienceResult {

@@ -156,6 +156,12 @@ export function useVocabularyLearning() {
     setCurrentItemIndex(0);
   }, []);
 
+  // 状態を再読み込み（クイズ完了後などに使用）
+  const reloadState = useCallback(() => {
+    const loaded = loadVocabState();
+    setState(loaded);
+  }, []);
+
   return {
     // 状態
     state,
@@ -174,6 +180,7 @@ export function useVocabularyLearning() {
     nextItem,
     changeRank,
     reset,
+    reloadState,
     setState,
   };
 }

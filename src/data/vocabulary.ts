@@ -172,11 +172,11 @@ export const VOCABULARY: VocabularyItem[] = [
   { id: 52, word: 'コップ', reading: 'こっぷ', meaning: 'Cup', image: '🥛', category: 'kitchen', rank: 6 },
   { id: 53, word: '箸', reading: 'はし', meaning: 'Chopsticks', image: '🥢', category: 'kitchen', rank: 6 },
   { id: 54, word: 'スプーン', reading: 'すぷーん', meaning: 'Spoon', image: '🥄', category: 'kitchen', rank: 6 },
-  { id: 55, word: 'フォーク', reading: 'ふぉーく', meaning: 'Fork', image: '🍴', category: 'kitchen', rank: 6 },
+  { id: 55, word: 'フォーク', reading: 'ふぉーく', meaning: 'Fork', image: '/images/vocabulary/fork.png', category: 'kitchen', rank: 6 },
   { id: 56, word: '鍋', reading: 'なべ', meaning: 'Pot', image: '🍲', category: 'kitchen', rank: 6 },
   { id: 57, word: 'フライパン', reading: 'ふらいぱん', meaning: 'Frying pan', image: '🍳', category: 'kitchen', rank: 6 },
   { id: 58, word: '冷蔵庫', reading: 'れいぞうこ', meaning: 'Refrigerator', image: '🧊', category: 'kitchen', rank: 6 },
-  { id: 59, word: '電子レンジ', reading: 'でんしれんじ', meaning: 'Microwave', image: '📦', category: 'kitchen', rank: 6 },
+  { id: 59, word: '電子レンジ', reading: 'でんしれんじ', meaning: 'Microwave', image: '/images/vocabulary/microwave.png', category: 'kitchen', rank: 6 },
   { id: 60, word: '包丁', reading: 'ほうちょう', meaning: 'Kitchen knife', image: '🔪', category: 'kitchen', rank: 6 },
 
   // ========== ランク7: 自然 ==========

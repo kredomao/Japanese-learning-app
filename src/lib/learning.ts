@@ -11,8 +11,8 @@ import {
   Phrase,
   LevelReward,
 } from '../types';
-import { gainExperience, applyExperienceResult } from './experience';
-import { saveUserState, checkStreakUpdate } from './storage';
+import { gainExperience, gainExperienceWithAmount, applyExperienceResult } from './experience';
+import { saveUserState, checkStreakUpdate, loadUserState } from './storage';
 import {
   checkAchievements,
   unlockAchievements,
@@ -22,6 +22,69 @@ import {
   generateDailyMissions,
   updateMissionProgress,
 } from './gamification';
+
+/**
+ * 「覚えた」ボタン押下時の処理（要件対応版）
+ * 
+ * 要件:
+ * - 学習済みIDを保存
+ * - 経験値を加算
+ * - レベルアップ判定を行う
+ * - 処理結果をオブジェクトで返す
+ * - LocalStorageに保存
+ * 
+ * @param phraseId 学習したフレーズID
+ * @returns 処理結果オブジェクト
+ */
+export function markAsLearned(phraseId: number): {
+  success: boolean;
+  learnedPhraseId: number;
+  experienceGained: number;
+  leveledUp: boolean;
+  newLevel: number;
+  newExperience: number;
+  userState: UserState;
+} {
+  // 現在のユーザー状態をLocalStorageから読み込み
+  const currentState = loadUserState();
+  
+  // 既に学習済みかチェック
+  const isAlreadyLearned = currentState.learnedPhraseIds.includes(phraseId);
+  
+  // 学習済みIDを保存（重複チェック）
+  const updatedLearnedIds = isAlreadyLearned
+    ? currentState.learnedPhraseIds
+    : [...currentState.learnedPhraseIds, phraseId];
+  
+  // 経験値を加算（既に学習済みの場合は加算しない）
+  const expGain = isAlreadyLearned ? 0 : EXP_PER_LEARNING;
+  const experienceResult = gainExperienceWithAmount(currentState, expGain);
+  
+  // レベルアップ判定はgainExperience内で行われ、experienceResult.leveledUpに反映される
+  
+  // 更新されたユーザー状態を構築
+  const updatedState: UserState = {
+    ...currentState,
+    learnedPhraseIds: updatedLearnedIds,
+    experience: experienceResult.newExperience,
+    level: experienceResult.newLevel,
+    totalExp: currentState.totalExp + experienceResult.experienceGained,
+  };
+  
+  // LocalStorageに保存
+  const saveSuccess = saveUserState(updatedState);
+  
+  // 処理結果を返す
+  return {
+    success: saveSuccess,
+    learnedPhraseId: phraseId,
+    experienceGained: experienceResult.experienceGained,
+    leveledUp: experienceResult.leveledUp,
+    newLevel: experienceResult.newLevel,
+    newExperience: experienceResult.newExperience,
+    userState: updatedState,
+  };
+}
 
 /**
  * 学習完了処理（フル機能版）
@@ -66,7 +129,7 @@ export function completeLearning(
       newStreak
     );
 
-    const baseResult = gainExperience(currentState, finalExp);
+    const baseResult = gainExperienceWithAmount(currentState, finalExp);
     experienceResult = {
       ...baseResult,
       bonusExp,

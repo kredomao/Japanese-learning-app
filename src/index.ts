@@ -9,6 +9,8 @@
 // 型定義
 export type {
   Phrase,
+  MeaningCategory,
+  MeaningCategoryDefinition,
   UserState,
   ExperienceResult,
   LearningResult,
@@ -73,7 +75,6 @@ export {
   getRarityColor,
   getRarityName,
 } from './data/achievements';
-
 // ボキャブラリー型定義
 export type {
   VocabularyItem,
@@ -96,6 +97,13 @@ export {
   getRankInfo,
   getUnlockedVocabulary,
 } from './data/vocabulary';
+
+// 意味カテゴリデータ
+export {
+  MEANING_CATEGORIES,
+  getMeaningCategory,
+  getAllMeaningCategories,
+} from './data/meaning-categories';
 
 // クイズ機能
 export {

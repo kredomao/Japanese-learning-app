@@ -11,7 +11,94 @@ export interface Phrase {
   example: string;     // 例文
   level: number;       // 難易度レベル (1-5)
   tags: string[];      // タグ（カテゴリ分類用）
+  meaningCategory?: MeaningCategory; // 意味カテゴリ（画像表示用・オプション）
+  image?: PhraseImage; // 学習補助画像（オプション・個別画像は使用しない）
 }
+
+// 意味カテゴリ（画像表示用）
+export type MeaningCategory =
+  | 'persistence'        // 努力・継続系
+  | 'failure-learning'   // 失敗・学習系
+  | 'wisdom-decision'    // 知恵・判断系
+  | 'action-challenge'   // 行動・挑戦系
+  | 'daily-life'         // 生活・習慣系
+  | 'relationship-growth' // 関係・成長系
+  | 'character-attitude' // 品格・態度系
+  | 'life-encounter';    // 人生・出会い系
+
+// 意味カテゴリの定義
+export interface MeaningCategoryDefinition {
+  id: MeaningCategory;
+  name: string;              // カテゴリ名（日本語）
+  nameEn: string;            // カテゴリ名（英語）
+  description: string;        // カテゴリの説明
+  imageConcept: string;       // 画像のコンセプト
+  searchKeywords: string[];   // 検索キーワード
+  imageUrl?: string;          // 共通画像URL
+  imageAlt?: string;          // 画像の代替テキスト
+}
+
+// 学習補助画像の定義
+export interface PhraseImage {
+  url: string;         // 画像URL（ローカルパス or 外部URL）
+  alt: string;        // 代替テキスト（アクセシビリティ用）
+  description: string; // 画像の説明（意味との対応関係）
+  source?: 'local' | 'external' | 'generated'; // 画像のソース
+  attribution?: ImageAttribution; // 画像の出典情報（フリー素材の場合）
+}
+
+// 画像の出典情報（フリー素材の場合）
+export interface ImageAttribution {
+  author: string;     // 作者名
+  source: 'unsplash' | 'pexels' | 'pixabay' | 'other'; // ソース
+  sourceUrl?: string; // ソースURL
+  license?: string;    // ライセンス情報
+}
+
+// 画像選定情報（選定プロセスを記録）
+export interface ImageSelectionInfo {
+  phraseId: number;
+  meaning: string;                    // 具体的な意味
+  realWorldSituation: string;          // 現実世界の状況
+  searchKeywords: string[];            // 検索キーワード
+  selectedImageUrl: string;            // 選定した画像URL
+  selectionReason: string;             // 選定理由
+  rejectedReasons: string[];           // 選ばなかった理由
+  selectedAt: string;                  // 選定日時（ISO形式）
+  selectedBy?: string;                 // 選定者
+}
+
+// 画像選定ガイドライン（開発者向け）
+export interface ImageSelectionGuide {
+  purpose: string;              // 画像の目的（何を理解させるか）
+  requiredElements: string[];    // 含めるべき要素
+  forbiddenElements: string[];   // 絶対に含めてはいけない要素
+  recommendedType: 'photo' | 'illustration'; // 推奨タイプ
+  notes?: string;                // 補足説明
+}
+
+/**
+ * 画像生成・選定時の禁止表現（全フレーズ共通）
+ * これらの表現は絶対に使用しないでください
+ */
+export const FORBIDDEN_IMAGE_EXPRESSIONS = [
+  'かわいい',
+  'キャラクター',
+  'デフォルメ',
+  'ファンタジー',
+  '面白おかしい',
+  '抽象的',
+  'メタファーのみで表現',
+] as const;
+
+/**
+ * 画像生成・選定時の必須要件（全フレーズ共通）
+ */
+export const REQUIRED_IMAGE_REQUIREMENTS = [
+  '現実に近い状況を描写する',
+  '実写写真または現実的なイラストのみ',
+  '装飾的要素は一切含めない',
+] as const;
 
 // ============================================
 // 🎮 ゲーミフィケーション - 実績システム
@@ -78,7 +165,8 @@ export interface StreakBonus {
 
 export type MissionType =
   | 'learn_count'      // N個学習
-  | 'learn_tag'        // 特定タグを学習
+  | 'learn_tag'        // 特定タグを学習（ことわざ用）
+  | 'learn_category'   // 特定カテゴリを学習（ボキャブラリー用）
   | 'review'           // 復習
   | 'perfect_streak';  // 連続正解（クイズ用）
 
@@ -87,7 +175,8 @@ export interface DailyMission {
   type: MissionType;
   description: string;
   target: number;
-  tag?: string;
+  tag?: string;           // ことわざのタグ（learn_tag用）
+  category?: string;      // ボキャブラリーのカテゴリ（learn_category用）
   reward: {
     exp: number;
   };

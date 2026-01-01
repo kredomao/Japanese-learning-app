@@ -21,6 +21,7 @@ export default function VocabularyPage() {
     changeRank,
     allRanks,
     state,
+    reloadState,
   } = useVocabularyLearning();
 
   const [showQuiz, setShowQuiz] = useState(false);
@@ -38,6 +39,8 @@ export default function VocabularyPage() {
     resetQuiz,
   } = useQuiz(state.rankProgress.currentRank, (result) => {
     setQuizResult(result);
+    // クイズ完了後、状態を再読み込みしてランクアンロックを反映
+    reloadState();
   });
 
   // クイズ開始
@@ -124,6 +127,7 @@ export default function VocabularyPage() {
                   const isSelected = selectedAnswer === option;
                   const isCorrect = option === currentQuestion.correctAnswer;
                   const showFeedback = showResult;
+                  const isImageOption = isImageUrl(option);
 
                   let buttonStyle = styles.optionButton;
                   if (showFeedback) {
@@ -143,8 +147,29 @@ export default function VocabularyPage() {
                       onClick={() => !showResult && submitAnswer(option)}
                       disabled={showResult}
                     >
-                      {option}
-                      {showFeedback && isCorrect && ' ✓'}
+                      {isImageOption ? (
+                        <div style={styles.optionImageContainer}>
+                          {isImageUrl(option) ? (
+                            <Image
+                              src={option}
+                              alt="Option"
+                              width={100}
+                              height={100}
+                              style={styles.optionImage}
+                            />
+                          ) : (
+                            <div style={styles.optionImageBox}>{option}</div>
+                          )}
+                          {showFeedback && isCorrect && (
+                            <span style={styles.correctMark}>✓</span>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          {option}
+                          {showFeedback && isCorrect && ' ✓'}
+                        </>
+                      )}
                     </button>
                   );
                 })}
@@ -257,12 +282,21 @@ export default function VocabularyPage() {
               </button>
             </div>
           </div>
+        ) : progress.total === 0 ? (
+          <div style={styles.completeCard}>
+            <h2>📝 準備中</h2>
+            <p>このランクにはまだ単語が登録されていません。</p>
+          </div>
         ) : (
           <div style={styles.completeCard}>
             <h2>🎉 全て学習完了！</h2>
             <p>このランクの全ての単語を学習しました。</p>
             {canTakeQuiz ? (
-              <button style={styles.quizButton} onClick={handleStartQuiz}>
+              <button 
+                style={styles.quizButton} 
+                onClick={handleStartQuiz}
+                disabled={!canTakeQuiz}
+              >
                 📝 クイズに挑戦
               </button>
             ) : (
@@ -498,6 +532,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#fff',
     cursor: 'pointer',
     transition: 'all 0.2s',
+    minHeight: '120px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   selectedButton: {
     background: 'rgba(96, 165, 250, 0.3)',
@@ -510,6 +548,43 @@ const styles: { [key: string]: React.CSSProperties } = {
   wrongButton: {
     background: 'rgba(239, 68, 68, 0.3)',
     borderColor: '#ef4444',
+  },
+  optionImageContainer: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    minHeight: '80px',
+  },
+  optionImage: {
+    borderRadius: '8px',
+    objectFit: 'contain',
+    width: '100px',
+    height: '100px',
+    maxWidth: '100%',
+    maxHeight: '100px',
+  },
+  optionImageBox: {
+    fontSize: '80px',
+    display: 'inline-block',
+    lineHeight: '1',
+  },
+  correctMark: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    fontSize: '24px',
+    color: '#22c55e',
+    fontWeight: 'bold',
+    background: 'rgba(0,0,0,0.7)',
+    borderRadius: '50%',
+    width: '30px',
+    height: '30px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   resultContainer: {
     background: 'rgba(255,255,255,0.1)',

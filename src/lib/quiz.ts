@@ -86,21 +86,21 @@ function createWordToImageQuestion(
 }
 
 /**
- * 読み方クイズを生成
+ * 読み方クイズを生成（画像を見て単語を選ぶ形式）
  */
 function createReadingQuestion(
   vocab: VocabularyItem,
   allVocab: VocabularyItem[]
 ): QuizQuestion {
-  const allReadings = allVocab.map((v) => v.reading);
-  const options = generateOptions(vocab.reading, allReadings);
+  const allWords = allVocab.map((v) => v.word);
+  const options = generateOptions(vocab.word, allWords);
 
   return {
     id: `q_${vocab.id}_read_${Date.now()}`,
     type: 'reading',
     vocabularyId: vocab.id,
-    question: `「${vocab.word}」の読み方は？`,
-    correctAnswer: vocab.reading,
+    question: 'これは何でしょう？',
+    correctAnswer: vocab.word,
     options,
     image: vocab.image,
   };
@@ -173,8 +173,8 @@ export function calculateQuizResult(
     expEarned += 50; // 合格ボーナス
   }
 
-  // 新ランク解放判定
-  const newRankUnlocked = passed && session.rankLevel >= rankProgress.highestUnlockedRank;
+  // 新ランク解放判定（100%正解、または合格点を超えて現在のランクが解放されている最大ランクと同じ場合）
+  const newRankUnlocked = passed && session.rankLevel === rankProgress.highestUnlockedRank;
 
   return {
     rankLevel: session.rankLevel,
@@ -272,9 +272,13 @@ export function updateRankProgress(
   };
 
   // 合格したら次のランクを解放
-  if (result.passed && result.rankLevel >= progress.highestUnlockedRank) {
-    newProgress.highestUnlockedRank = result.rankLevel + 1;
-    newProgress.currentRank = result.rankLevel + 1;
+  // 現在のランクが解放されている最大ランクと同じ場合に、次のランクを解放
+  if (result.passed && result.rankLevel === progress.highestUnlockedRank) {
+    const nextRank = result.rankLevel + 1;
+    // 次のランクが存在する場合のみ解放（最大ランクは10）
+    if (nextRank <= 10) {
+      newProgress.highestUnlockedRank = nextRank;
+    }
   }
 
   return newProgress;
@@ -295,6 +299,8 @@ export function canAttemptQuiz(
   learnedIds: number[]
 ): boolean {
   const vocabulary = getVocabularyByRank(rankLevel);
+  // 単語が存在し、かつ全て学習済みの場合のみクイズに挑戦可能
+  if (vocabulary.length === 0) return false;
   return vocabulary.every((v) => learnedIds.includes(v.id));
 }
 

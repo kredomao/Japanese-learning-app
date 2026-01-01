@@ -302,7 +302,7 @@ export function getDailyMissionDetails(
 }
 
 /**
- * ミッション進捗を更新
+ * ミッション進捗を更新（ことわざ学習用）
  */
 export function updateMissionProgress(
   state: DailyMissionState,
@@ -320,6 +320,45 @@ export function updateMissionProgress(
       shouldIncrement = true;
     } else if (template.type === 'learn_tag' && template.tag) {
       shouldIncrement = learnedPhrase.tags.includes(template.tag);
+    }
+
+    if (shouldIncrement) {
+      const newCurrent = mission.current + 1;
+      return {
+        ...mission,
+        current: newCurrent,
+        completed: newCurrent >= template.target,
+      };
+    }
+
+    return mission;
+  });
+
+  return {
+    ...state,
+    missions: updatedMissions,
+  };
+}
+
+/**
+ * ミッション進捗を更新（ボキャブラリー学習用）
+ */
+export function updateMissionProgressForVocabulary(
+  state: DailyMissionState,
+  category: string
+): DailyMissionState {
+  const updatedMissions = state.missions.map((mission, index) => {
+    if (mission.completed) return mission;
+
+    const templateIndex = parseInt(mission.missionId.split('_')[2]) || index;
+    const template = DAILY_MISSION_TEMPLATES[templateIndex % DAILY_MISSION_TEMPLATES.length];
+
+    let shouldIncrement = false;
+
+    if (template.type === 'learn_count') {
+      shouldIncrement = true;
+    } else if (template.type === 'learn_category' && template.category) {
+      shouldIncrement = category === template.category;
     }
 
     if (shouldIncrement) {

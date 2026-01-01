@@ -1,0 +1,68 @@
+/**
+ * ことわざ・言い回しの学習補助画像カードのスタイル
+ */
+
+.phrase-image-card {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.phrase-image-card__figure {
+  margin: 0;
+  padding: 0;
+}
+
+.phrase-image-card__image {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #f5f5f5;
+  object-fit: cover;
+}
+
+.phrase-image-card__caption {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  line-height: 1.6;
+  background: #ffffff;
+  border-top: 1px solid #e5e5e5;
+}
+
+.phrase-image-card__attribution {
+  padding: 0.5rem 1rem;
+  background: #f9f9f9;
+  border-top: 1px solid #e5e5e5;
+  text-align: center;
+}
+
+.phrase-image-card__attribution small {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.phrase-image-card__link {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.phrase-image-card__link:hover {
+  text-decoration: underline;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .phrase-image-card {
+    margin: 1rem 0;
+  }
+
+  .phrase-image-card__caption {
+    padding: 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
